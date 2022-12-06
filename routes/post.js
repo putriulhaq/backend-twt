@@ -21,7 +21,7 @@ router.get("/timeline" , async (req,res) => {
     res.send(posts)
 });
 
-
+//post tweet
 router.post("/posts", authMiddleware, async(req, res)=> {
     try{
         const userIdLogin = res.locals.user.userId
@@ -43,6 +43,19 @@ router.post("/posts", authMiddleware, async(req, res)=> {
     }
 })
 
+// get post by id
+router.get("/timeline/:Id", async(req,res) => {
+    const {Id} = req.params
+    const dataPosts =  await Posts.find({postId:Id})
+    const getById = dataPosts.map(data => {
+        return{
+            data: data
+        };
+    });
+    res.json(getById)
+})
+
+//deleted
 router.delete("/posts/delete/:postId", async(req, res) => {
     const {postId} = req.params;  
     const getPost = await Posts.find({postId});
