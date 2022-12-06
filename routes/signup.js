@@ -15,9 +15,11 @@ const userSchema = Joi.object({
     confirm: Joi.string(),
 });
 
+
 router.post("/signup", authLoginUserMiddleware, async (req, res) => {
     try {
         const { username, email, password, confirm } = await userSchema.validateAsync(req.body);
+        console.log({username, email, password, confirm})
 
         if(password !== confirm){
             return res.status(412).send({
@@ -50,7 +52,7 @@ router.post("/signup", authLoginUserMiddleware, async (req, res) => {
             },
         });
 
-        if (user.length){
+        if (user.email === email){
             return res.status(412).send({
                 errorMessages: "Username or email already exists",
             });
