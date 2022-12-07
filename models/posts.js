@@ -21,6 +21,10 @@ const postSchema = new Schema({
         type:Number,
         ref:'User'
     },
+    userName:{
+        type:String,
+        ref:'User'
+    },
     createdAt: {
         type: Date,
         default: Date.now

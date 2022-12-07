@@ -4,18 +4,22 @@ const Posts = require('../models/posts')
 const Users = require ('../models/users')
 const authMiddleware = require("../middlewares/authMiddleware")
 const { connection } = require("mongoose")
+const cookieParser = require('cookie-parser')
+const jwt = require("jsonwebtoken")
+const date = require('date-and-time')
 
 //TIMELINE
 router.get("/timeline" , async (req,res) => {
     const timeline = await Posts.find();
-    const dataUsers = await Users.find();
-    
+    // const datauser = await Users.find();
+    // const userMap = datauser.reduce((map, user) => map.set(user.userId, user.username), new Map());
     const posts = timeline.map(post => {
-        const userId  = post.userId; 
+        // const name  = userMap.get(post.userId);
         return {
             title: post.title,
             content: post.content,
-            username: post.userId
+            username: post.userName,
+            datetime: date.format(post.createdAt, 'DD/MM/YYYY HH:mm:ss'),
         }
     })
     res.send(posts)
@@ -23,19 +27,22 @@ router.get("/timeline" , async (req,res) => {
 
 //post tweet
 router.post("/posts", authMiddleware, async(req, res)=> {
-    try{
+    try{      
         const userIdLogin = res.locals.user.userId
+        const userName = res.locals.user.username
         const postData = new Posts({
             postId:0,
             title:req.body.title,
             content:req.body.content,
             userId:userIdLogin,
+            username:userName,
         });
         const createPost = await Posts.create({
             postId:postData.postId,
             title: postData.title,
             content: postData.content,
-            userId:postData.userId
+            userId:postData.userId,
+            userName:userName
         });
         res.json(createPost);
     } catch(e){
@@ -65,10 +72,5 @@ router.delete("/posts/delete/:postId", async(req, res) => {
     res.json({ result: "deleted success" });
 })
 
-router.get("/all", async(req, res) => {
-    const allPost = await Posts.find();
-    res.json(allPost)
-
-})
 
 module.exports = router;

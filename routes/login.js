@@ -43,7 +43,7 @@ router.post("/login", authLoginUserMiddleware, async (req, res) => {
         const expires = new Date();
         expires.setDate(expires.getMinutes() + 60);
 
-        const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY);
+        const token = jwt.sign({ userId: user.userId, username:user.username }, process.env.SECRET_KEY);
 
         res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
             expires: expires,
