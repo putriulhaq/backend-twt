@@ -44,7 +44,9 @@ router.post("/posts", authMiddleware, async(req, res)=> {
             userId:postData.userId,
             userName:userName
         });
-        res.json(createPost);
+        return res.status(200).send({ 
+            message: "Post created successfully”"
+        });
     } catch(e){
         console.log(e)
     }
@@ -56,10 +58,37 @@ router.get("/timeline/:Id", async(req,res) => {
     const dataPosts =  await Posts.find({postId:Id})
     const getById = dataPosts.map(data => {
         return{
-            data: data
+            title: data.title,
+            content: data.content,
+            username: data.userName,
+            datetime: date.format(data.createdAt, 'DD/MM/YYYY HH:mm:ss'),
         };
     });
     res.json(getById)
+})
+
+// get post by user id 
+router.get("/timeline/user/:user", async(req, res) => {
+    const {user} = req.params;
+    const dataPosts =  await Posts.find({userId:user})
+    const getByuser = dataPosts.map(data => {
+        return{
+            title: data.title,
+            content: data.content,
+            username: data.userName,
+            datetime: date.format(data.createdAt, 'DD/MM/YYYY HH:mm:ss'),
+        };
+    });
+    res.json(getByuser)
+})
+
+//update post
+router.put("/posts/update/:postId", async(req, res) => {
+    const {post} = req.params
+    const data = await Posts.updateOne(post, {$set: req.body});
+    return res.status(200).send({ 
+        message: "Your post has been edited”"
+    });
 })
 
 //deleted
@@ -69,7 +98,9 @@ router.delete("/posts/delete/:postId", async(req, res) => {
     if (getPost.length > 0){
         await Posts.deleteOne({postId})
     }
-    res.json({ result: "deleted success" });
+    return res.status(200).send({ 
+        message: "Your post has been deleted"
+    });
 })
 
 
